@@ -2,7 +2,7 @@ from datetime import datetime
 from nio.common.block.base import Block
 from nio.common.discovery import Discoverable, DiscoverableType
 from nio.metadata.properties.timedelta import TimeDeltaProperty
-from blocks.base_blocks.group_by.group_by_block import GroupBy
+from .block_supplements.group_by.group_by_block import GroupBy
 
 
 @Discoverable(DiscoverableType.block)
