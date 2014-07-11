@@ -1,4 +1,3 @@
-from datetime import datetime
 from unittest.mock import MagicMock
 from ..debounce_block import Debouncer
 from nio.util.support.block_test_case import NIOBlockTestCase
