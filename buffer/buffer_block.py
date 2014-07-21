@@ -11,10 +11,10 @@ from nio.common.signal.base import Signal
 @Discoverable(DiscoverableType.block)
 class Buffer(Block):
 
-    interval = TimeDeltaProperty()
-    timeout = BoolProperty(default=False)
-    timeout_attr = StringProperty(visible=False, default="timeout")
-    use_persistence = BoolProperty(visible=False, default=False)
+    interval = TimeDeltaProperty(title='Buffer Interval')
+    timeout = BoolProperty(title='Buffer Timeout', default=False)
+    timeout_attr = StringProperty(title='Timeout Attributes', visible=False, default="timeout")
+    use_persistence = BoolProperty(title='Use Persistence?', visible=False, default=False)
 
     def __init__(self):
         super().__init__()

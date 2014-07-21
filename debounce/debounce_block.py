@@ -18,7 +18,7 @@ class Debouncer(Block, GroupBy):
 
     """
 
-    interval = TimeDeltaProperty()
+    interval = TimeDeltaProperty(title='Debounce Interval')
 
     def __init__(self):
         Block.__init__(self)
