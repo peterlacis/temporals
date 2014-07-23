@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 from ..buffer_block import Buffer
 from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.common.signal.base import Signal
-from nio.modules.threading.imports import Event
+from nio.modules.threading import Event
 
 
 class EventBuffer(Buffer):

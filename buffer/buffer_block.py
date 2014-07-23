@@ -4,7 +4,7 @@ from nio.common.discovery import Discoverable, DiscoverableType
 from nio.metadata.properties.bool import BoolProperty
 from nio.metadata.properties.timedelta import TimeDeltaProperty
 from nio.metadata.properties.string import StringProperty
-from nio.modules.scheduler.imports import Job
+from nio.modules.scheduler import Job
 from nio.common.signal.base import Signal
 
 

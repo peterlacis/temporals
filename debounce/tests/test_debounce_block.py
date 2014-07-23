@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 from ..debounce_block import Debouncer
 from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.common.signal.base import Signal
-from nio.modules.threading.imports import sleep
+from nio.modules.threading import sleep
 
 
 class TestDebounce(NIOBlockTestCase):
