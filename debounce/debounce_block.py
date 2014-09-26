@@ -13,7 +13,7 @@ class Debouncer(Block, GroupBy):
 
     Properties:
         group_by (expression): The value by which signals are grouped.
-        interval (timedelta): At most one signal from each group will 
+        interval (timedelta): At most one signal from each group will
             be emitted per this interval.
 
     """
@@ -30,9 +30,16 @@ class Debouncer(Block, GroupBy):
         super().configure(context)
         self._last_emission = self.persistence.load('last_emission') or {}
         self._groups = self.persistence.load('groups') or []
-    
+
+    def stop(self):
+        super().stop()
+        self.for_each_group(self.cleanup_group)
+        self._store()
+        self._backup()
+
     def process_signals(self, signals):
         self.for_each_group(self.process_group, signals)
+        self.for_each_group(self.cleanup_group)
         self._persist_if_dirty()
 
     def process_group(self, signals, key):
@@ -40,7 +47,8 @@ class Debouncer(Block, GroupBy):
         last_emission = self._last_emission.get(key)
         if last_emission is None or \
            now - last_emission > self.interval:
-            self._logger.debug("Emitting a signal at %s" % now)
+            self._logger.debug(
+                "Emitting a signal from group {} at {}".format(key, now))
             self._last_emission[key] = now
             self._dirty = True
             self.notify_signals(signals[:1])
@@ -57,6 +65,16 @@ class Debouncer(Block, GroupBy):
 
     def _backup(self):
         self.persistence.save()
-        
 
-        
+    def cleanup_group(self, key):
+        now = datetime.utcnow()
+        last_emission = self._last_emission.get(key)
+        if last_emission is not None and \
+                now - last_emission > self.interval:
+            try:
+                self._groups.remove(key)
+                del self._last_emission[key]
+                self._logger.debug("Cleaning up group {}".format(key))
+            except:
+                self._logger.warning(
+                    "Failed trying to delete group {}".format(key))

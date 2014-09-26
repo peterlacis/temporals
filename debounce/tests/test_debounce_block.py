@@ -6,7 +6,7 @@ from nio.modules.threading import sleep
 
 
 class TestDebounce(NIOBlockTestCase):
-    
+
     def test_debounce(self):
         block = Debouncer()
         block._backup = MagicMock()
@@ -35,7 +35,7 @@ class TestDebounce(NIOBlockTestCase):
         })
         block.start()
         block.process_signals([
-            Signal({'foo': 'bar'}), 
+            Signal({'foo': 'bar'}),
         ])
         self.assert_num_signals_notified(1, block)
         block.process_signals([
@@ -47,3 +47,22 @@ class TestDebounce(NIOBlockTestCase):
         block.process_signals([Signal({'foo': 'bar'})])
         self.assert_num_signals_notified(3, block)
         block.stop()
+
+    def test_cleanup_group(self):
+        block = Debouncer()
+        block._backup = MagicMock()
+        self.configure_block(block, {
+            "interval": {
+                "milliseconds": 200
+            },
+            "group_by": "{{$foo}}"
+        })
+        block.start()
+        block.process_signals([
+            Signal({'foo': 'bar'}),
+            Signal({'foo': 'qux'})
+        ])
+        self.assertEqual(['bar', 'qux'], block._groups)
+        sleep(0.2)
+        block.stop()
+        self.assertEqual([], block._groups)
