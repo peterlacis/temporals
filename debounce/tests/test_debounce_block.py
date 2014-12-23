@@ -6,7 +6,9 @@ from nio.modules.threading import sleep
 
 
 class TestDebounce(NIOBlockTestCase):
-    
+    def get_test_modules(self):
+        return self.ServiceDefaultModules + ['persistence']
+
     def test_debounce(self):
         block = Debouncer()
         block._backup = MagicMock()
@@ -35,7 +37,7 @@ class TestDebounce(NIOBlockTestCase):
         })
         block.start()
         block.process_signals([
-            Signal({'foo': 'bar'}), 
+            Signal({'foo': 'bar'}),
         ])
         self.assert_num_signals_notified(1, block)
         block.process_signals([
