@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 from time import time
 from nio.common.block.base import Block
@@ -22,7 +23,7 @@ class Buffer(Block):
     def __init__(self):
         super().__init__()
         self._last_emission = None
-        self._cache = {}
+        self._cache = defaultdict(list)
         self._cache_lock = Lock()
         self._emission_job = None
 
@@ -30,10 +31,10 @@ class Buffer(Block):
         super().configure(context)
         if self.use_persistence:
             self._last_emission = self.persistence.load('last_emission')
-            self._cache = self.persistence.load('cache') or {}
+            self._cache = self.persistence.load('cache') or defaultdict(list)
             # For backwards compatability, make sure cache is dict.
             if not isinstance(self._cache, dict):
-                self._cache = {}
+                self._cache = defaultdict(list)
 
     def start(self):
         now = datetime.utcnow()
@@ -51,6 +52,7 @@ class Buffer(Block):
             self._backup()
 
     def emit(self, reset=False):
+        self._logger.debug('Emitting signals')
         if reset:
             self._emission_job.cancel()
             self._emission_job = Job(
@@ -61,9 +63,13 @@ class Buffer(Block):
         self._last_emission = datetime.utcnow()
         signals = self._get_emit_signals()
         if signals:
+            self._logger.debug('Notifying {} signals'.format(len(signals)))
             self.notify_signals(signals)
         elif self.timeout:
+            self._logger.debug('Notifying timeout signal')
             self.notify_signals([Signal({self.timeout_attr: True})])
+        else:
+            self._logger.debug('No signals to notify')
         if self.use_persistence:
             self.persistence.store('last_emission', self._last_emission)
             self._backup()
@@ -75,6 +81,8 @@ class Buffer(Block):
             if self.interval_duration:
                 # Remove old signals from cache.
                 old = now - int(self.interval_duration.total_seconds())
+                self._logger.debug(
+                    'Removing signals from cache older than {}'.format(old))
                 cache_times = sorted(self._cache.keys())
                 for cache_time in cache_times:
                     if cache_time < old:
@@ -85,16 +93,14 @@ class Buffer(Block):
                 signals.extend(self._cache[cache])
             if not self.interval_duration:
                 # Clear cache every time if duration is not set.
-                self._cache = {}
+                self._logger.debug('Clearing cache of signals')
+                self._cache = defaultdict(list)
             return signals
 
     def process_signals(self, signals):
         with self._cache_lock:
             now = int(time())
-            if now in self._cache:
-                self._cache[now].extend(signals)
-            else:
-                self._cache[now] = signals
+            self._cache[now].extend(signals)
 
     def _backup(self):
         self.persistence.store('cache', self._cache)
