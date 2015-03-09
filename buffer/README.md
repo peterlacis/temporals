@@ -32,4 +32,4 @@ Any list of signals.
 
 Output
 ---------
-At the end of every **interval** all input signals since the last **interval** will be emitted.
+At the end of every **interval** all input signals over the last **interval_duration** will be emitted. If **interval_duration** is unspecified or 0, then all input signals over the last **interval** will be emitted.
