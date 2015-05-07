@@ -1,4 +1,4 @@
-from ..debounce_block import Debouncer
+from ..debounce.debounce_block import Debouncer
 from unittest.mock import MagicMock
 from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.common.signal.base import Signal
@@ -6,6 +6,7 @@ from nio.modules.threading import sleep
 
 
 class TestDebounce(NIOBlockTestCase):
+
     def get_test_modules(self):
         return self.ServiceDefaultModules + ['persistence']
 

@@ -1,12 +1,12 @@
-from ..buffer_block import Buffer
+from ..buffer.buffer_block import Buffer
 from unittest.mock import MagicMock
 from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.common.signal.base import Signal
 from nio.modules.threading import Event
-from time import sleep
 
 
 class EventBuffer(Buffer):
+
     def __init__(self, event):
         super().__init__()
         self._event = event
