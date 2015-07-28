@@ -24,4 +24,4 @@ Any list of signals.
 
 Output
 ---------
-The first signal for each group in **grou_by**, every **interval**.
+The first signal for each group in **group_by**, every **interval**.
